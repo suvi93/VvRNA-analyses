@@ -6,15 +6,15 @@ library(gridExtra)
 # P24X0 data
 data1 <- data.frame(
   Tissue = c("Head", "Legs", "Gonads"),
-  MBG_X = c(0, 0, 14),           # male-biased genes on chrX
-  MBG_1 = c(4, 3, 99),           # male-biased genes on chr1
-  MBG_A = c(2, 2, 767),          # male-biased genes on the rest of the autosomes
-  UBG_X = c(1226, 1126, 1014),   # un-biased genes on chrX
-  UBG_1 = c(1158, 1062, 977),    # un-biased genes on chr1
-  UBG_A = c(10132, 9325, 8560),  # un-biased genes on the rest of the autosomes
-  FBG_X = c(2, 3, 144),          # female-biased genes on chrX
-  FBG_1 = c(0, 0, 55),           # female-biased genes on chr1
-  FBG_A = c(1, 5, 601)           # female-biased genes on the rest of the autosomes
+  MBG_X =  c(0, 0, 14),           # male-biased genes on chrX
+  MBG_1 =  c(4, 3, 99),           # male-biased genes on chr1
+  MBG_A =  c(2, 2, 767),          # male-biased genes on the rest of the autosomes
+  UBG_X =  c(1226, 1126, 1014),   # un-biased genes on chrX
+  UBG_1 =  c(1158, 1062, 977),    # un-biased genes on chr1
+  UBG_A =  c(10132, 9325, 8560),  # un-biased genes on the rest of the autosomes
+  FBG_X =  c(2, 3, 144),          # female-biased genes on chrX
+  FBG_1 =  c(0, 0, 55),           # female-biased genes on chr1
+  FBG_A =  c(1, 5, 601)           # female-biased genes on the rest of the autosomes
 )
 
 # Rearrange data
@@ -52,19 +52,19 @@ p1 <- ggplot(data_long1, aes(x = Group, y = Proportion, fill = Type)) +
 
 # P24XY data
 data2 <- data.frame(
-  Tissue = c("Head", "Legs", "Gonads"),
-  MBG_XL = c(0, 0, 16),          # male-biased genes on chrXL
-  MBG_XRYPAR = c(0, 2, 92),      # male-biased genes on pseudo-autosomal region of chrXR-Y
-  MBG_XRYSLR = c(0, 0, 18),      # male-biased genes on sex-linked region of chrXR-Y
-  MBG_A = c(0, 2, 893),          # male-biased genes on autosomes
-  UBG_XL = c(1045, 965, 815),    # un-biased genes on chrXL
-  UBG_XRYPAR = c(926, 816, 769), # un-biased genes on pseudo-autosomal region of chrXR-Y
-  UBG_XRYSLR = c(179, 148, 148), # un-biased genes on sex-linked region of chrXR-Y
-  UBG_A = c(9719, 8628, 8211),   # un-biased genes on autosomes
-  FBG_XL = c(2, 2, 198),         # female-biased genes on chrXL
-  FBG_XRYPAR = c(0, 0, 59),      # female-biased genes on pseuso-autosomal region of chrXR-Y
-  FBG_XRYSLR = c(0, 0, 11),      # female-biased genes on sex-linked region of chrXR-Y
-  FBG_A = c(6, 9, 723)           # female-biased genes on autosomes
+  Tissue =       c("Head", "Legs", "Gonads"),
+  MBG_XL =       c(0, 0, 16),          # male-biased genes on chrXL
+  MBG_XRYPAR =   c(0, 2, 92),          # male-biased genes on pseudo-autosomal region of chrXR-Y
+  MBG_XRYSLR =   c(0, 0, 18),          # male-biased genes on sex-linked region of chrXR-Y
+  MBG_A =        c(0, 2, 893),         # male-biased genes on autosomes
+  UBG_XL =       c(1045, 965, 815),    # un-biased genes on chrXL
+  UBG_XRYPAR =   c(926, 816, 769),     # un-biased genes on pseudo-autosomal region of chrXR-Y
+  UBG_XRYSLR =   c(179, 148, 148),     # un-biased genes on sex-linked region of chrXR-Y
+  UBG_A =        c(9719, 8628, 8211),  # un-biased genes on autosomes
+  FBG_XL =       c(2, 2, 198),         # female-biased genes on chrXL
+  FBG_XRYPAR =   c(0, 0, 59),          # female-biased genes on pseuso-autosomal region of chrXR-Y
+  FBG_XRYSLR =   c(0, 0, 11),          # female-biased genes on sex-linked region of chrXR-Y
+  FBG_A =        c(6, 9, 723)          # female-biased genes on autosomes
 )
 
 # Rearrange data
