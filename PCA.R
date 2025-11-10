@@ -1,11 +1,9 @@
 library(DESeq2)
 library(ggplot2)
-library(ggpubr)  # for combining plots
-library(patchwork)  # optional alternative for multi-panel layout
+library(ggpubr)  
+library(patchwork) 
 
-#-------------------------------------------
 # Function to generate PCA plot for a dataset
-#-------------------------------------------
 generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NULL) {
   
   # Step 1: Read data
@@ -59,9 +57,7 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
   return(pca_plot)
 }
 
-#-------------------------------------------
 # Generate all four panels
-#-------------------------------------------
 
 # PANEL A — P24X0 (all samples)
 p1 <- generate_pca_plot(
@@ -93,12 +89,10 @@ p4 <- generate_pca_plot(
   title = "(d) P24XY - Outliers Removed"
 )
 
-#-------------------------------------------
 # Combine all 4 panels into one figure
-#-------------------------------------------
+
 combined_plot <- (p1 | p2) / (p3 | p4)
 
-#-------------------------------------------
-# Save final 4-panel figure
-#-------------------------------------------
-ggsave("All_Tissues_PCA_4panel.pdf", combined_plot, width = 12, height = 10)
+
+# Save figure
+ggsave("All_Tissues_PCA.pdf", combined_plot, width = 12, height = 10)
