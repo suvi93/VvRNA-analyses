@@ -2,18 +2,12 @@
 library(DESeq2)
 
 count_data = as.matrix(read.csv("MF_gonads_FCforDS.tsv",sep="\t",row.names="gene_id"))
-count_data <- count_data[, !colnames(count_data) %in% "FOS84"] #P24XY samples removed after PCA analysis
 col_data = read.table(file = "MF_gonads_info.txt", header = T, sep = "\t")
 
 count_data = as.matrix(read.csv("MF_head_FCforDS.tsv",sep="\t",row.names="gene_id"))
-count_data <- count_data[, !colnames(count_data) %in% "FHS8"] #P24X0 samples removed after PCA analysis
-count_data <- count_data[, !colnames(count_data) %in% "FHS61"] #P24XY samples removed after PCA analysis
 col_data = read.table(file = "MF_head_info.txt", header = T, sep = "\t")
 
 count_data = as.matrix(read.csv("MF_legs_FCforDS.tsv",sep="\t",row.names="gene_id"))
-remove_samples <- c("FLS20", "MLS39") #P24X0 samples removed after PCA analysis
-count_data <- count_data[, !colnames(count_data) %in% remove_samples] 
-count_data <- count_data[, !colnames(count_data) %in% "FLS74"] #P24XY samples removed after PCA analysis
 col_data = read.table(file = "MF_legs_info.txt", header = T, sep = "\t")
 
 dds = DESeqDataSetFromMatrix(countData = count_data, colData = col_data, design = ~ condition)
