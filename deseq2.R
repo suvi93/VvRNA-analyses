@@ -2,12 +2,18 @@
 library(DESeq2)
 
 count_data = as.matrix(read.csv("MF_gonads_FCforDS.tsv",sep="\t",row.names="gene_id"))
+count_data <- count_data[, !colnames(count_data) %in% "FOS84"] #XY
 col_data = read.table(file = "MF_gonads_info.txt", header = T, sep = "\t")
 
 count_data = as.matrix(read.csv("MF_head_FCforDS.tsv",sep="\t",row.names="gene_id"))
+count_data <- count_data[, !colnames(count_data) %in% "FHS8"] #X0
+count_data <- count_data[, !colnames(count_data) %in% "FHS61"] #XY
 col_data = read.table(file = "MF_head_info.txt", header = T, sep = "\t")
 
 count_data = as.matrix(read.csv("MF_legs_FCforDS.tsv",sep="\t",row.names="gene_id"))
+remove_samples <- c("FLS20", "MLS39") #X0
+count_data <- count_data[, !colnames(count_data) %in% remove_samples] 
+count_data <- count_data[, !colnames(count_data) %in% "FLS74"] #XY
 col_data = read.table(file = "MF_legs_info.txt", header = T, sep = "\t")
 
 dds = DESeqDataSetFromMatrix(countData = count_data, colData = col_data, design = ~ condition)
