@@ -20,13 +20,7 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
                                 design = ~ condition)
   
   # Step 4: Regularized log transformation
-  rld <- rlogTransformation(dds)
-  
-  # Identify and optionally remove outliers
-  if (!is.null(outlier_samples)) {
-    dds <- dds[, !(colnames(dds) %in% outlier_samples)]
-    rld <- rlogTransformation(dds)
-  }
+  rld <- vst(dds)
   
   # Step 5: Generate PCA plot
   pca_plot <- plotPCA(rld, intgroup = "condition") +
@@ -66,33 +60,16 @@ p1 <- generate_pca_plot(
   title = "(a) P24X0 - All Samples"
 )
 
-# PANEL B — P24X0 (outliers removed)
+
+# PANEL B — P24XY (all samples)
 p2 <- generate_pca_plot(
-  count_file = "MF_alltissues_FC_P24X0.tsv",
-  info_file  = "MF_alltissues_info_P24X0.txt",
-  outlier_samples = c("FHS8", "FLS20", "MLS39"),
-  title = "(b) P24X0 - Outliers Removed"
-)
-
-# PANEL C — P24XY (all samples)
-p3 <- generate_pca_plot(
   count_file = "MF_alltissues_FC_P24XY.tsv",
   info_file  = "MF_alltissues_info_P24XY.txt",
-  title = "(c) P24XY - All Samples"
-)
-
-# PANEL D — P24XY (outliers removed)
-p4 <- generate_pca_plot(
-  count_file = "MF_alltissues_FC_P24XY.tsv",
-  info_file  = "MF_alltissues_info_P24XY.txt",
-  outlier_samples = c("FHS61", "FLS74", "FOS84"),
-  title = "(d) P24XY - Outliers Removed"
+  title = "(b) P24XY - All Samples"
 )
 
 # Combine all 4 panels into one figure
-
-combined_plot <- (p1 | p2) / (p3 | p4)
-
+combined_plot <- (p1 | p2)
 
 # Save figure
 ggsave("All_Tissues_PCA.pdf", combined_plot, width = 12, height = 10)
