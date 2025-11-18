@@ -51,15 +51,13 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
   return(pca_plot)
 }
 
-# Generate all four panels
-
+# Generate both panels
 # PANEL A — P24X0 (all samples)
 p1 <- generate_pca_plot(
   count_file = "MF_alltissues_FC_P24X0.tsv",
   info_file  = "MF_alltissues_info_P24X0.txt",
   title = "(a) P24X0 - All Samples"
 )
-
 
 # PANEL B — P24XY (all samples)
 p2 <- generate_pca_plot(
@@ -68,7 +66,7 @@ p2 <- generate_pca_plot(
   title = "(b) P24XY - All Samples"
 )
 
-# Combine all 4 panels into one figure
+# Combine both panels into one figure
 combined_plot <- (p1 | p2)
 
 # Save figure
