@@ -19,7 +19,7 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
                                 colData = col_data,
                                 design = ~ condition)
   
-  # Step 4: Regularized log transformation
+  # Step 4: vst transformation
   rld <- vst(dds)
   
   # Step 5: Generate PCA plot
