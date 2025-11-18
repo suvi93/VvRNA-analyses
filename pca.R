@@ -20,8 +20,14 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
                                 design = ~ condition)
   
   # Step 4: vst transformation
-  rld <- vst(dds)
-  
+  rld <- rlogTransformation(dds)
+
+  # Identify and optionally remove outliers
+  if (!is.null(outlier_samples)) {
+    dds <- dds[, !(colnames(dds) %in% outlier_samples)]
+    rld <- rlogTransformation(dds)
+  }
+
   # Step 5: Generate PCA plot
   pca_plot <- plotPCA(rld, intgroup = "condition") +
     ggtitle(title) +
@@ -51,7 +57,7 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
   return(pca_plot)
 }
 
-# Generate both panels
+# Generate all panels
 # PANEL A — P24X0 (all samples)
 p1 <- generate_pca_plot(
   count_file = "MF_alltissues_FC_P24X0.tsv",
@@ -59,15 +65,28 @@ p1 <- generate_pca_plot(
   title = "(a) P24X0 - All Samples"
 )
 
-# PANEL B — P24XY (all samples)
+# PANEL B — P24X0 (outliers removed)
 p2 <- generate_pca_plot(
-  count_file = "MF_alltissues_FC_P24XY.tsv",
-  info_file  = "MF_alltissues_info_P24XY.txt",
-  title = "(b) P24XY - All Samples"
+  count_file = "MF_alltissues_FC_P24X0.tsv",
+  info_file  = "MF_alltissues_info_P24X0.txt",
+  outlier_samples = c("FHS8", "FLS20", "MLS39"),
+  title = "(b) P24X0 - Outliers Removed"
 )
 
-# Combine both panels into one figure
-combined_plot <- (p1 | p2)
+# PANEL C — P24XY (all samples)
+p3 <- generate_pca_plot(
+  count_file = "MF_alltissues_FC_P24XY.tsv",
+  info_file  = "MF_alltissues_info_P24XY.txt",
+  title = "(c) P24XY - All Samples"
+)
+
+# PANEL D — P24XY (outliers removed)
+p4 <- generate_pca_plot(
+  count_file = "MF_alltissues_FC_P24XY.tsv",
+  info_file  = "MF_alltissues_info_P24XY.txt",
+  outlier_samples = c("FHS61", "FLS74", "FOS84"),
+  title = "(d) P24XY - Outliers Removed"
+)
 
 # Save figure
 ggsave("All_Tissues_PCA.pdf", combined_plot, width = 12, height = 10)
