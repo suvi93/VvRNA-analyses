@@ -6,4 +6,4 @@ Scripts used for analyses in the paper Evolutionary dynamics of dosage compensat
 3. deseq2.R - R script used for differential gene expression analyses
 5. heatmap.R - R script used to generate heatmap of top 25 up & down-regulated differentially expressed genes per tissue classified by chromosome
 6. sbg_xavstackedbar.R - R script used to generate figure 5 in the paper
-7. Box_plot.R files - R scripts used to generate figures 2, 3 & 4 in the paper
+7. box_plot.R files - R scripts used to generate figures 2, 3 & 4 in the paper
