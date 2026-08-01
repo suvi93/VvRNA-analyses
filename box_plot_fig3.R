@@ -1,3 +1,21 @@
+# ------------------------------------------------------------------
+# box_plot_fig3.R
+#
+# Generates Figure 3: log2(male/female) expression ratio boxplots
+# across chromosomal regions (autosomes, Chr1, ChrX/ChrXL, etc.) in
+# gonad tissue, comparing P24X0 and P24XY races.
+#
+# Input:  per-race, per-region TPM mean tables (e.g.
+#         P24XOMF_gonads_autosomes_TPMmean.tsv.new)
+# Output: combined multi-panel figure (Figure 3 of the paper)
+#
+# Part of: VvRNA-analyses pipeline (step 3 — visualization)
+# Author:  Octavio Palacios, Suvratha Jayaprasad
+# Paper:   Jayaprasad et al. 2026, Genome Biology and Evolution,
+#          https://doi.org/10.1093/gbe/evag026
+# License: MIT — see LICENSE
+# ------------------------------------------------------------------
+
 # Load required libraries
 library(readr)
 library(dplyr)
@@ -6,7 +24,9 @@ library(ggstatsplot)
 library(RColorBrewer)
 library(patchwork)
 
-setwd("/Users/octaviopalacios/Desktop/DC_paper/Figures/Figure_2")
+# ====================================================================
+# LOAD & FILTER HELPERS
+# ====================================================================
 
 # Function to load and filter data
 load_and_filter_data <- function(file, female_col, male_col, chr_label) {
@@ -14,11 +34,11 @@ load_and_filter_data <- function(file, female_col, male_col, chr_label) {
   print(paste("Loading file:", file))
   print("Column names detected:")
   print(colnames(df))
-  
+
   if (!(female_col %in% colnames(df)) | !(male_col %in% colnames(df))) {
     stop(paste("Error: Column", female_col, "or", male_col, "not found in", file))
   }
-  
+
   df <- df %>% filter(.data[[female_col]] >= 1, .data[[male_col]] >= 1)
   df$gene_id <- chr_label
   return(df)
@@ -31,39 +51,67 @@ prepare_data <- function(df, column_name, new_col_name) {
   return(df)
 }
 
+# ====================================================================
+# HEAD & LEGS
+# ====================================================================
+
 Male_combined <- list()
 Female_combined <- list()
 
 body_parts <- list(
   "head" = list(
     "autosomes" = list("file" = "MF_head_ATPMmean.tsv", "female_col" = "FHS_A", "male_col" = "MHS_A"),
-    "par" = list("file" = "P24XYMF_head_PARXrYTPMmean.tsv.new", "female_col" = "FHS_XrY", "male_col" = "MHS_XrY"),
-    "slr" = list("file" = "P24XYMF_head_SLRXrYTPMmean.tsv.new", "female_col" = "FHS_XrY", "male_col" = "MHS_XrY"),
-    "chrx" = list("file" = "MF_head_XlTPMmean.tsv", "female_col" = "FHS_Xl", "male_col" = "MHS_Xl")
+    "par"       = list("file" = "P24XYMF_head_PARXrYTPMmean.tsv.new", "female_col" = "FHS_XrY", "male_col" = "MHS_XrY"),
+    "slr"       = list("file" = "P24XYMF_head_SLRXrYTPMmean.tsv.new", "female_col" = "FHS_XrY", "male_col" = "MHS_XrY"),
+    "chrx"      = list("file" = "MF_head_XlTPMmean.tsv", "female_col" = "FHS_Xl", "male_col" = "MHS_Xl")
   ),
   "legs" = list(
     "autosomes" = list("file" = "MF_legs_ATPMmean.tsv", "female_col" = "FLS_A", "male_col" = "MLS_A"),
-    "par" = list("file" = "P24XYMF_legs_PARXrYTPMmean.tsv.new", "female_col" = "FLS_XrY", "male_col" = "MLS_XrY"),
-    "slr" = list("file" = "P24XYMF_legs_SLRXrYTPMmean.tsv.new", "female_col" = "FLS_XrY", "male_col" = "MLS_XrY"),
-    "chrx" = list("file" = "MF_legs_XlTPMmean.tsv", "female_col" = "FLS_Xl", "male_col" = "MLS_Xl")
+    "par"       = list("file" = "P24XYMF_legs_PARXrYTPMmean.tsv.new", "female_col" = "FLS_XrY", "male_col" = "MLS_XrY"),
+    "slr"       = list("file" = "P24XYMF_legs_SLRXrYTPMmean.tsv.new", "female_col" = "FLS_XrY", "male_col" = "MLS_XrY"),
+    "chrx"      = list("file" = "MF_legs_XlTPMmean.tsv", "female_col" = "FLS_Xl", "male_col" = "MLS_Xl")
   )
 )
 
 for (part in names(body_parts)) {
   datasets <- body_parts[[part]]
-  
+
   Male_combined[[part]] <- bind_rows(
-    prepare_data(load_and_filter_data(datasets$autosomes$file, datasets$autosomes$female_col, datasets$autosomes$male_col, "Autosomes"), datasets$autosomes$male_col, "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$par$file, datasets$par$female_col, datasets$par$male_col, "chrXR-Y PAR"), datasets$par$male_col, "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$slr$file, datasets$slr$female_col, datasets$slr$male_col, "chrXR-Y SLR"), datasets$slr$male_col, "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$chrx$file, datasets$chrx$female_col, datasets$chrx$male_col, "chrXL"), datasets$chrx$male_col, "Mean_TPM")
+    prepare_data(
+      load_and_filter_data(datasets$autosomes$file, datasets$autosomes$female_col, datasets$autosomes$male_col, "Autosomes"),
+      datasets$autosomes$male_col, "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(datasets$par$file, datasets$par$female_col, datasets$par$male_col, "chrXR-Y PAR"),
+      datasets$par$male_col, "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(datasets$slr$file, datasets$slr$female_col, datasets$slr$male_col, "chrXR-Y SLR"),
+      datasets$slr$male_col, "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(datasets$chrx$file, datasets$chrx$female_col, datasets$chrx$male_col, "chrXL"),
+      datasets$chrx$male_col, "Mean_TPM"
+    )
   )
-  
+
   Female_combined[[part]] <- bind_rows(
-    prepare_data(load_and_filter_data(datasets$autosomes$file, datasets$autosomes$female_col, datasets$autosomes$male_col, "Autosomes"), datasets$autosomes$female_col, "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$par$file, datasets$par$female_col, datasets$par$male_col, "chrXR-Y PAR"), datasets$par$female_col, "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$slr$file, datasets$slr$female_col, datasets$slr$male_col, "chrXR-Y SLR"), datasets$slr$female_col, "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$chrx$file, datasets$chrx$female_col, datasets$chrx$male_col, "chrXL"), datasets$chrx$female_col, "Mean_TPM")
+    prepare_data(
+      load_and_filter_data(datasets$autosomes$file, datasets$autosomes$female_col, datasets$autosomes$male_col, "Autosomes"),
+      datasets$autosomes$female_col, "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(datasets$par$file, datasets$par$female_col, datasets$par$male_col, "chrXR-Y PAR"),
+      datasets$par$female_col, "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(datasets$slr$file, datasets$slr$female_col, datasets$slr$male_col, "chrXR-Y SLR"),
+      datasets$slr$female_col, "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(datasets$chrx$file, datasets$chrx$female_col, datasets$chrx$male_col, "chrXL"),
+      datasets$chrx$female_col, "Mean_TPM"
+    )
   )
 }
 
@@ -71,7 +119,7 @@ plot_boxplot <- function(data, value_col, title, palette_used = NULL) {
   data$gene_id <- factor(data$gene_id,
                          levels = c("Autosomes", "chrXR-Y PAR", "chrXR-Y SLR", "chrXL"))
   data <- data %>% mutate(log2_value = log2(.data[[value_col]]))
-  
+
   plot <- ggbetweenstats(
     data = data, x = gene_id, y = log2_value,
     xlab = "", ylab = "log2(TPM)",
@@ -108,8 +156,12 @@ print(p2)
 print(p3)
 print(p4)
 
-MF_ratio_head <- Male_combined$head %>% mutate(Ratio = Mean_TPM / Female_combined$head$Mean_TPM) %>% mutate(log2_Ratio = log2(Ratio))
-MF_ratio_legs <- Male_combined$legs %>% mutate(Ratio = Mean_TPM / Female_combined$legs$Mean_TPM) %>% mutate(log2_Ratio = log2(Ratio))
+MF_ratio_head <- Male_combined$head %>%
+  mutate(Ratio = Mean_TPM / Female_combined$head$Mean_TPM) %>%
+  mutate(log2_Ratio = log2(Ratio))
+MF_ratio_legs <- Male_combined$legs %>%
+  mutate(Ratio = Mean_TPM / Female_combined$legs$Mean_TPM) %>%
+  mutate(log2_Ratio = log2(Ratio))
 
 MF_ratio_head$gene_id <- factor(MF_ratio_head$gene_id,
                                 levels = c("Autosomes", "chrXR-Y PAR", "chrXR-Y SLR", "chrXL"))
@@ -150,11 +202,15 @@ p6$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 print(p5)
 print(p6)
 
+# ====================================================================
+# GONADS
+# ====================================================================
+
 gonad_files <- list(
   "autosomes" = "MF_gonads_ATPMmean.tsv",
-  "par" = "P24XYMF_gonads_PARXrYTPMmean.tsv.new",
-  "slr" = "P24XYMF_gonads_SLRXrYTPMmean.tsv.new",
-  "chrx" = "MF_gonads_XlTPMmean.tsv"
+  "par"       = "P24XYMF_gonads_PARXrYTPMmean.tsv.new",
+  "slr"       = "P24XYMF_gonads_SLRXrYTPMmean.tsv.new",
+  "chrx"      = "MF_gonads_XlTPMmean.tsv"
 )
 
 Male_combined_gonads <- bind_rows(
@@ -198,7 +254,7 @@ p9 <- ggbetweenstats(
   violin.args = list(width = 0.7, alpha = 0.2, na.rm = TRUE),
   centrality.label.args = list(size = 2, nudge_x = 0.4, segment.linetype = 4,
                                min.segment.length = 0)
-  
+
 ) + scale_color_manual(name = "Chromosome", values = palette1) + theme(legend.position = 'none')
 
 # Modify the jitter layer inside the ggplot object
@@ -206,6 +262,10 @@ p9 <- ggbetweenstats(
 p9$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 
 print(p9)
+
+# ====================================================================
+# COMBINE ALL PANELS INTO FIGURE 3
+# ====================================================================
 
 combined_plot <- p1 + p2 + p5 + p3 + p4 + p6 + p7 + p8 + p9 +
   plot_annotation(tag_levels = list(c('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))) &

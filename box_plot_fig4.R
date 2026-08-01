@@ -1,3 +1,21 @@
+# ------------------------------------------------------------------
+# box_plot_fig4.R
+#
+# Generates Figure 4: combined boxplot panels comparing expression
+# patterns across tissues and chromosomal regions between P24X0 and
+# P24XY races.
+#
+# Input:  per-tissue/region TPM mean tables (derived from deseq2.R /
+#         featureCounts output)
+# Output: combined 3-panel figure (Figure 4 of the paper)
+#
+# Part of: VvRNA-analyses pipeline (step 3 — visualization)
+# Author:  Octavio Palacios, Suvratha Jayaprasad
+# Paper:   Jayaprasad et al. 2026, Genome Biology and Evolution,
+#          https://doi.org/10.1093/gbe/evag026
+# License: MIT — see LICENSE
+# ------------------------------------------------------------------
+
 library(readr)
 library(dplyr)
 library(ggplot2)
@@ -5,8 +23,9 @@ library(ggstatsplot)
 library(RColorBrewer)
 library(patchwork)
 
-# Set working directory
-setwd("/Users/octaviopalacios/Desktop/DC_paper/Figures/Figure_3")
+# ====================================================================
+# GONADS
+# ====================================================================
 
 # Load existing autosomes data (P24X0)
 P24XOMF <- read_delim("P24XOMF_gonads_autosomes_TPMmean.tsv.new",
@@ -129,10 +148,9 @@ plot_combined_1$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 
 plot_combined_1
 
-##########################################################
-
-# Set working directory
-setwd("/Users/octaviopalacios/Desktop/DC_paper/Figures/Figure_3")
+# ====================================================================
+# HEAD
+# ====================================================================
 
 # Load existing head autosomes data (P24X0)
 P24XOMF_head_autosomes_TPMmean.tsv <- read_delim("P24XOMF_head_autosomes_TPMmean.tsv.new",
@@ -255,10 +273,9 @@ plot_combined_2$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 
 plot_combined_2
 
-#########################################################
-
-# Set working directory
-setwd("/Users/octaviopalacios/Desktop/DC_paper/Figures/Figure_3")
+# ====================================================================
+# LEGS
+# ====================================================================
 
 # Load existing leg autosomes data (P24X0)
 P24XOMF_legs_autosomes_TPMmean.tsv <- read_delim("P24XOMF_legs_autosomes_TPMmean.tsv.new", 
@@ -381,7 +398,11 @@ plot_combined_3$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 
 plot_combined_3
 
-# Put the legend of x-axis 45-degreess
+# ====================================================================
+# COMBINE ALL PANELS INTO FIGURE 4
+# ====================================================================
+
+# Put the legend of x-axis 45-degrees
 plot_combined_1 <- plot_combined_1 + 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 

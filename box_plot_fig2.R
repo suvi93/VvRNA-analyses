@@ -1,3 +1,21 @@
+# ------------------------------------------------------------------
+# box_plot_fig2.R
+#
+# Generates Figure 2: log2(TPM) and log2(M/F TPM) boxplots by
+# chromosome/region across tissues, comparing expression between
+# sexes and chromosomal regions.
+#
+# Input:  per-tissue/chromosome TPM mean tables (derived from
+#         deseq2.R / featureCounts output)
+# Output: combined multi-panel figure (Figure 2 of the paper)
+#
+# Part of: VvRNA-analyses pipeline (step 3 — visualization)
+# Author:  Octavio Palacios, Suvratha Jayaprasad
+# Paper:   Jayaprasad et al. 2026, Genome Biology and Evolution,
+#          https://doi.org/10.1093/gbe/evag026
+# License: MIT — see LICENSE
+# ------------------------------------------------------------------
+
 library(readr)
 library(dplyr)
 library(ggplot2)
@@ -5,7 +23,9 @@ library(ggstatsplot)
 library(RColorBrewer)
 library(patchwork)
 
-setwd("/Users/octaviopalacios/Desktop/DC_paper/Figures/Figure_1")
+# ====================================================================
+# HEAD & LEGS
+# ====================================================================
 
 # Function to load and filter data
 load_and_filter_data <- function(file, female_col, male_col, chr_label) {
@@ -37,7 +57,7 @@ plot_boxplot <- function(data, value_col, title, palette_used = NULL) {
     centrality.label.args = list(size = 2, nudge_x = 0.4, segment.linetype = 4,
                                  min.segment.length = 0)
   )
-  if(!is.null(palette_used)){
+  if (!is.null(palette_used)) {
     plot <- plot + scale_color_manual(name = "Chromosome", values = palette_used)
   }
   plot + theme(legend.position = 'none', legend.text = element_text(size = 10))
@@ -63,17 +83,65 @@ Female_combined <- list()
 
 for (part in names(body_parts)) {
   datasets <- body_parts[[part]]
-  
+
   Male_combined[[part]] <- bind_rows(
-    prepare_data(load_and_filter_data(datasets$autosomes, paste0("F", toupper(substr(part, 1, 1)), "S_autosomes_mean"), paste0("M", toupper(substr(part, 1, 1)), "S_autosomes_mean"), "Autosomes"), paste0("M", toupper(substr(part, 1, 1)), "S_autosomes_mean"), "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$chr1, paste0("F", toupper(substr(part, 1, 1)), "S_chr1_mean"), paste0("M", toupper(substr(part, 1, 1)), "S_chr1_mean"), "chr1"), paste0("M", toupper(substr(part, 1, 1)), "S_chr1_mean"), "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$chrx, paste0("F", toupper(substr(part, 1, 1)), "S_chrx_mean"), paste0("M", toupper(substr(part, 1, 1)), "S_chrx_mean"), "chrX"), paste0("M", toupper(substr(part, 1, 1)), "S_chrx_mean"), "Mean_TPM")
+    prepare_data(
+      load_and_filter_data(
+        datasets$autosomes,
+        paste0("F", toupper(substr(part, 1, 1)), "S_autosomes_mean"),
+        paste0("M", toupper(substr(part, 1, 1)), "S_autosomes_mean"),
+        "Autosomes"
+      ),
+      paste0("M", toupper(substr(part, 1, 1)), "S_autosomes_mean"), "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(
+        datasets$chr1,
+        paste0("F", toupper(substr(part, 1, 1)), "S_chr1_mean"),
+        paste0("M", toupper(substr(part, 1, 1)), "S_chr1_mean"),
+        "chr1"
+      ),
+      paste0("M", toupper(substr(part, 1, 1)), "S_chr1_mean"), "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(
+        datasets$chrx,
+        paste0("F", toupper(substr(part, 1, 1)), "S_chrx_mean"),
+        paste0("M", toupper(substr(part, 1, 1)), "S_chrx_mean"),
+        "chrX"
+      ),
+      paste0("M", toupper(substr(part, 1, 1)), "S_chrx_mean"), "Mean_TPM"
+    )
   )
-  
+
   Female_combined[[part]] <- bind_rows(
-    prepare_data(load_and_filter_data(datasets$autosomes, paste0("F", toupper(substr(part, 1, 1)), "S_autosomes_mean"), paste0("M", toupper(substr(part, 1, 1)), "S_autosomes_mean"), "Autosomes"), paste0("F", toupper(substr(part, 1, 1)), "S_autosomes_mean"), "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$chr1, paste0("F", toupper(substr(part, 1, 1)), "S_chr1_mean"), paste0("M", toupper(substr(part, 1, 1)), "S_chr1_mean"), "chr1"), paste0("F", toupper(substr(part, 1, 1)), "S_chr1_mean"), "Mean_TPM"),
-    prepare_data(load_and_filter_data(datasets$chrx, paste0("F", toupper(substr(part, 1, 1)), "S_chrx_mean"), paste0("M", toupper(substr(part, 1, 1)), "S_chrx_mean"), "chrX"), paste0("F", toupper(substr(part, 1, 1)), "S_chrx_mean"), "Mean_TPM")
+    prepare_data(
+      load_and_filter_data(
+        datasets$autosomes,
+        paste0("F", toupper(substr(part, 1, 1)), "S_autosomes_mean"),
+        paste0("M", toupper(substr(part, 1, 1)), "S_autosomes_mean"),
+        "Autosomes"
+      ),
+      paste0("F", toupper(substr(part, 1, 1)), "S_autosomes_mean"), "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(
+        datasets$chr1,
+        paste0("F", toupper(substr(part, 1, 1)), "S_chr1_mean"),
+        paste0("M", toupper(substr(part, 1, 1)), "S_chr1_mean"),
+        "chr1"
+      ),
+      paste0("F", toupper(substr(part, 1, 1)), "S_chr1_mean"), "Mean_TPM"
+    ),
+    prepare_data(
+      load_and_filter_data(
+        datasets$chrx,
+        paste0("F", toupper(substr(part, 1, 1)), "S_chrx_mean"),
+        paste0("M", toupper(substr(part, 1, 1)), "S_chrx_mean"),
+        "chrX"
+      ),
+      paste0("F", toupper(substr(part, 1, 1)), "S_chrx_mean"), "Mean_TPM"
+    )
   )
 }
 
@@ -100,8 +168,12 @@ print(p3)
 print(p4)
 
 # Compute Male/Female ratio separately for heads and legs
-MF_ratio_head <- Male_combined$head %>% mutate(Ratio = Mean_TPM / Female_combined$head$Mean_TPM) %>% mutate(log2_Ratio = log2(Ratio))
-MF_ratio_legs <- Male_combined$legs %>% mutate(Ratio = Mean_TPM / Female_combined$legs$Mean_TPM) %>% mutate(log2_Ratio = log2(Ratio))
+MF_ratio_head <- Male_combined$head %>%
+  mutate(Ratio = Mean_TPM / Female_combined$head$Mean_TPM) %>%
+  mutate(log2_Ratio = log2(Ratio))
+MF_ratio_legs <- Male_combined$legs %>%
+  mutate(Ratio = Mean_TPM / Female_combined$legs$Mean_TPM) %>%
+  mutate(log2_Ratio = log2(Ratio))
 
 # Plot Male/Female ratio separately for heads and legs
 p5 <- ggbetweenstats(
@@ -138,21 +210,24 @@ p6$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 print(p5)
 print(p6)
 
-## Foor the gonads
+# ====================================================================
+# GONADS
+# ====================================================================
+
 # Function to load and filter data
 load_and_filter_data <- function(file, female_col, male_col, chr_label) {
   df <- read.delim(file, header = TRUE, check.names = TRUE)  # Ensure correct column names
-  
+
   # Debug: Print column names to verify
   print(paste("Loading file:", file))
   print("Column names detected:")
   print(colnames(df))
-  
+
   # Check if required columns exist before filtering
   if (!(female_col %in% colnames(df)) | !(male_col %in% colnames(df))) {
     stop(paste("Error: Column", female_col, "or", male_col, "not found in", file))
   }
-  
+
   # Apply filtering only if columns exist
   df <- df %>% filter(.data[[female_col]] >= 1, .data[[male_col]] >= 1)
   df$gene_id <- chr_label  # Label the chromosome group
@@ -174,15 +249,33 @@ gonad_files <- list(
 )
 
 Male_combined <- bind_rows(
-  prepare_data(load_and_filter_data(gonad_files$autosomes, "FOS_autosomes_mean", "MTS_autosomes_mean", "Autosomes"), "MTS_autosomes_mean", "Mean_TPM"),
-  prepare_data(load_and_filter_data(gonad_files$chr1, "FOS_chr1_mean", "MTS_chr1_mean", "chr1"), "MTS_chr1_mean", "Mean_TPM"),
-  prepare_data(load_and_filter_data(gonad_files$chrx, "FOS_chrx_mean", "MTS_chrx_mean", "chrX"), "MTS_chrx_mean", "Mean_TPM")
+  prepare_data(
+    load_and_filter_data(gonad_files$autosomes, "FOS_autosomes_mean", "MTS_autosomes_mean", "Autosomes"),
+    "MTS_autosomes_mean", "Mean_TPM"
+  ),
+  prepare_data(
+    load_and_filter_data(gonad_files$chr1, "FOS_chr1_mean", "MTS_chr1_mean", "chr1"),
+    "MTS_chr1_mean", "Mean_TPM"
+  ),
+  prepare_data(
+    load_and_filter_data(gonad_files$chrx, "FOS_chrx_mean", "MTS_chrx_mean", "chrX"),
+    "MTS_chrx_mean", "Mean_TPM"
+  )
 )
 
 Female_combined <- bind_rows(
-  prepare_data(load_and_filter_data(gonad_files$autosomes, "FOS_autosomes_mean", "MTS_autosomes_mean", "Autosomes"), "FOS_autosomes_mean", "Mean_TPM"),
-  prepare_data(load_and_filter_data(gonad_files$chr1, "FOS_chr1_mean", "MTS_chr1_mean", "chr1"), "FOS_chr1_mean", "Mean_TPM"),
-  prepare_data(load_and_filter_data(gonad_files$chrx, "FOS_chrx_mean", "MTS_chrx_mean", "chrX"), "FOS_chrx_mean", "Mean_TPM")
+  prepare_data(
+    load_and_filter_data(gonad_files$autosomes, "FOS_autosomes_mean", "MTS_autosomes_mean", "Autosomes"),
+    "FOS_autosomes_mean", "Mean_TPM"
+  ),
+  prepare_data(
+    load_and_filter_data(gonad_files$chr1, "FOS_chr1_mean", "MTS_chr1_mean", "chr1"),
+    "FOS_chr1_mean", "Mean_TPM"
+  ),
+  prepare_data(
+    load_and_filter_data(gonad_files$chrx, "FOS_chrx_mean", "MTS_chrx_mean", "chrX"),
+    "FOS_chrx_mean", "Mean_TPM"
+  )
 )
 
 # Generate color palette
@@ -242,7 +335,10 @@ p9 <- ggbetweenstats(
 p9$layers[[1]]$position <- position_jitter(width = 0.2, height = 0)
 print(p9)
 
-# Combine plots using patchwork
+# ====================================================================
+# COMBINE ALL PANELS INTO FIGURE 2
+# ====================================================================
+
 combined_plot <- p1 + p2 + p5 + p3 + p4 + p6 + p7 + p8 + p9 +
   plot_annotation(tag_levels = list(c('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))) &
   theme(plot.tag = element_text(face = 'bold'))

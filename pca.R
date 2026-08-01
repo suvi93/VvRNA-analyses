@@ -1,24 +1,45 @@
+# ------------------------------------------------------------------
+# pca.R
+#
+# Principal component analysis of rlog-transformed expression data,
+# for P24X0 and P24XY, with and without outlier samples removed.
+#
+# Input:  per-race, all-tissue featureCounts tables + sample info
+#         files (e.g. MF_alltissues_FC_P24X0.tsv)
+# Output: 4-panel PCA figure (All_Tissues_PCA.pdf)
+#
+# Part of: VvRNA-analyses pipeline (exploratory analysis / QC)
+# Author:  Suvratha Jayaprasad
+# Paper:   Jayaprasad et al. 2026, Genome Biology and Evolution,
+#          https://doi.org/10.1093/gbe/evag026
+# License: MIT — see LICENSE
+# ------------------------------------------------------------------
+
 library(DESeq2)
 library(ggplot2)
-library(ggpubr)  
-library(patchwork) 
+library(ggpubr)
+library(patchwork)
+
+# ====================================================================
+# PCA PLOT FUNCTION
+# ====================================================================
 
 # Function to generate PCA plot for a dataset
 generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NULL) {
-  
+
   # Step 1: Read data
   count_data <- read.csv(count_file, sep = "\t", row.names = "gene_id")
   col_data <- read.table(info_file, header = TRUE, sep = "\t", row.names = 1)
-  
+
   # Step 2: Ensure columns and metadata align
   stopifnot(all(colnames(count_data) %in% rownames(col_data)))
   col_data <- col_data[colnames(count_data), , drop = FALSE]
-  
+
   # Step 3: Create DESeq2 object
   dds <- DESeqDataSetFromMatrix(countData = count_data,
                                 colData = col_data,
                                 design = ~ condition)
-  
+
   # Step 4: vst transformation
   rld <- rlogTransformation(dds)
 
@@ -53,11 +74,14 @@ generate_pca_plot <- function(count_file, info_file, title, outlier_samples = NU
         "MTS" = "Male Testes", "FOS" = "Female Ovaries"
       )
     )
-  
+
   return(pca_plot)
 }
 
-# Generate all panels
+# ====================================================================
+# GENERATE ALL PANELS
+# ====================================================================
+
 # PANEL A — P24X0 (all samples)
 p1 <- generate_pca_plot(
   count_file = "MF_alltissues_FC_P24X0.tsv",
@@ -88,5 +112,12 @@ p4 <- generate_pca_plot(
   title = "(d) P24XY - Outliers Removed"
 )
 
-# Save figure
+# ====================================================================
+# COMBINE ALL PANELS
+# ====================================================================
+combined_plot <- (p1 | p2) / (p3 | p4)
+
+# ====================================================================
+# SAVE ALL PANELS
+# ====================================================================
 ggsave("All_Tissues_PCA.pdf", combined_plot, width = 12, height = 10)

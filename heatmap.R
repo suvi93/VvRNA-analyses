@@ -1,13 +1,42 @@
+# ------------------------------------------------------------------
+# heatmap.R
+#
+# Heatmaps of the top 25 up- and down-regulated differentially
+# expressed genes per tissue, split by chromosome/region (autosomes,
+# Chr1, ChrX for P24X0; autosomes, ChrXL, ChrXR-Y SLR/PAR for P24XY).
+#
+# Input:  top-25-TPM DEG tables per tissue/chromosome, derived from
+#         deseq2.R output (e.g. MF_gonads_onP24XOM_ADEGs_top25TPM.tsv)
+# Output: P24XO_clustered_heatmaps.pdf, P24XY_clustered_heatmaps.pdf
+#
+# Part of: VvRNA-analyses pipeline (step 3 — visualization)
+# Author:  Suvratha Jayaprasad
+# Paper:   Jayaprasad et al. 2026, Genome Biology and Evolution,
+#          https://doi.org/10.1093/gbe/evag026
+# License: MIT — see LICENSE
+# ------------------------------------------------------------------
+
 library(pheatmap)
 library(data.table)
 library(gridExtra)
 library(grid)
 
-#### P24X0
-# All samples
-male_samples <- c("MTS53", "MTS54", "MTS55", "MTS56", "MTS57", "MTS58", "MTS59", "MTS60","MLS39", "MLS40", "MLS41", "MLS42", "MLS43", "MLS44", "MLS45", "MHS31", "MHS32", "MHS33", "MHS34", "MHS35", "MHS36", "MHS37", "MHS38")
+# ====================================================================
+# P24X0
+# ====================================================================
 
-female_samples <- c("FOS21", "FOS22", "FOS23", "FOS24", "FOS25", "FOS26", "FOS27", "FOS28", "FOS29", "FOS30", "FLS11", "FLS12", "FLS13", "FLS14", "FLS15", "FLS16", "FLS17", "FLS18", "FLS19", "FLS20", "FHS1", "FHS2", "FHS3", "FHS4", "FHS5", "FHS6", "FHS7", "FHS8", "FHS9", "FHS10")
+# All samples
+male_samples <- c(
+  "MTS53", "MTS54", "MTS55", "MTS56", "MTS57", "MTS58", "MTS59", "MTS60",
+  "MLS39", "MLS40", "MLS41", "MLS42", "MLS43", "MLS44", "MLS45",
+  "MHS31", "MHS32", "MHS33", "MHS34", "MHS35", "MHS36", "MHS37", "MHS38"
+)
+
+female_samples <- c(
+  "FOS21", "FOS22", "FOS23", "FOS24", "FOS25", "FOS26", "FOS27", "FOS28", "FOS29", "FOS30",
+  "FLS11", "FLS12", "FLS13", "FLS14", "FLS15", "FLS16", "FLS17", "FLS18", "FLS19", "FLS20",
+  "FHS1", "FHS2", "FHS3", "FHS4", "FHS5", "FHS6", "FHS7", "FHS8", "FHS9", "FHS10"
+)
 
 all_samples <- c(male_samples, female_samples)
 
@@ -69,12 +98,22 @@ pdf("P24XO_clustered_heatmaps.pdf", width = 12, height = 18)
 grid.arrange(grobs = heatmap_list, ncol = 3)
 dev.off()
 
-##### P24XY
+# ====================================================================
+# P24XY
+# ====================================================================
 
 # All samples
-male_samples <- c("MTS98", "MTS99", "MTS100", "MTS101", "MTS102", "MTS103", "MTS104", "MLS93", "MLS94", "MLS95", "MLS96", "MLS97", "MHS86", "MHS87", "MHS88", "MHS89", "MHS90", "MHS91", "MHS92")
+male_samples <- c(
+  "MTS98", "MTS99", "MTS100", "MTS101", "MTS102", "MTS103", "MTS104",
+  "MLS93", "MLS94", "MLS95", "MLS96", "MLS97",
+  "MHS86", "MHS87", "MHS88", "MHS89", "MHS90", "MHS91", "MHS92"
+)
 
-female_samples <- c("FOS51", "FOS52", "FOS77", "FOS78"," FOS79"," FOS80"," FOS81", "FOS82", "FOS83", "FOS84", "FOS85", "FLS67", "FLS68", "FLS69", "FLS70", "FLS71", "FLS72", "FLS73", "FLS74", "FLS75", "FLS76", "FHS46", "FHS47", "FHS48", "FHS49", "FHS50", "FHS61", "FHS62", "FHS63", "FHS64", "FHS65", "FHS66")
+female_samples <- c(
+  "FOS51", "FOS52", "FOS77", "FOS78", "FOS79", "FOS80", "FOS81", "FOS82", "FOS83", "FOS84", "FOS85",
+  "FLS67", "FLS68", "FLS69", "FLS70", "FLS71", "FLS72", "FLS73", "FLS74", "FLS75", "FLS76",
+  "FHS46", "FHS47", "FHS48", "FHS49", "FHS50", "FHS61", "FHS62", "FHS63", "FHS64", "FHS65", "FHS66"
+)
 
 all_samples <- c(male_samples, female_samples)
 
@@ -124,27 +163,27 @@ read_and_prepare <- function(file) {
 # Generate heatmaps
 heatmap_list <- list()
 for (i in seq_along(files)) {
- if ((is_file_empty(files[i]))) {
-   empty_plot <- ggplot() +
+  if ((is_file_empty(files[i]))) {
+    empty_plot <- ggplot() +
       theme_void() +
       annotate("text", x = 0.5, y = 0.5, label = paste(titles[i], "\n(No data available)"),
                size = 4, hjust = 0.5, vjust = 0.5, fontface = "italic")
     heatmap_list[[i]] <- empty_plot
-} else {
-  mat <- read_and_prepare(files[i])
-  annotation <- sample_sex[colnames(mat), , drop = FALSE]
+  } else {
+    mat <- read_and_prepare(files[i])
+    annotation <- sample_sex[colnames(mat), , drop = FALSE]
 
-  heatmap <- pheatmap(
-    mat,
-    silent = TRUE,
-    main = titles[i],
-    annotation_col = annotation,
-    cluster_cols = FALSE,         # Turn off clustering to group by sex explicitly
-    show_colnames = FALSE,        # Hide sample names
-    fontsize = 7
-  )
-  heatmap_list[[i]] <- heatmap[[4]]
-}
+    heatmap <- pheatmap(
+      mat,
+      silent = TRUE,
+      main = titles[i],
+      annotation_col = annotation,
+      cluster_cols = FALSE,         # Turn off clustering to group by sex explicitly
+      show_colnames = FALSE,        # Hide sample names
+      fontsize = 7
+    )
+    heatmap_list[[i]] <- heatmap[[4]]
+  }
 }
 
 # Save plots
