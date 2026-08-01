@@ -74,4 +74,4 @@ Suvratha Jayaprasad — [GitHub](https://github.com/suvrathaprasad) · [portfoli
 
 ## License
 
-MIT (or specify your preferred license — see [Notes](#notes) below)
+This project is licensed under the [MIT License](LICENSE).
