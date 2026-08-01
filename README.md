@@ -46,6 +46,11 @@ alignment.sh  →  deseq2.R  →  pca.R / heatmap.R / box_plot_fig*.R / sbg_xavs
 - R ≥ 4.0 with `DESeq2`, `ggplot2`, and standard tidyverse packages
 - A read aligner as specified in `alignment.sh` (e.g., STAR/HISAT2 — see script for exact tool/version)
 
+## Data availability
+
+- **Genome assemblies** (P24X0 and P24XY races): NCBI BioProject [PRJNA945230](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA945230)
+- **RNA-seq reads**: NCBI BioProject [PRJNA668746](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA668746)
+
 ## Related repositories
 
 - Genome assembly: Li et al. (2024), *Chromosome-level genome assembly of the morabine grasshopper Vandiemenella viatica*
