@@ -37,24 +37,19 @@ This repository contains the scripts used to analyze dosage compensation and sex
 alignment.sh  →  deseq2.R  →  pca.R / heatmap.R / box_plot_fig*.R / sbg_xavstackedbar_fig5.R
 ```
 
-1. **`alignment.sh`** aligns raw RNA-seq reads for all samples.
+1. **`alignment.sh`** aligns raw RNA-seq reads for all samples and get read counts for each sample, all done per tissue.
 2. **`deseq2.R`** takes the resulting count data and performs differential expression testing between sexes/tissues.
 3. The remaining `R` scripts consume the DESeq2 output to produce the exploratory (PCA, heatmap) and publication figures (Figs. 2–5).
 
 ## Requirements
 
 - R ≥ 4.0 with `DESeq2`, `ggplot2`, and standard tidyverse packages
-- A read aligner as specified in `alignment.sh` (e.g., STAR/HISAT2 — see script for exact tool/version)
+- Read aligner (STAR) used in `alignment.sh`
 
 ## Data availability
 
 - **Genome assemblies** (P24X0 and P24XY races): NCBI BioProject [PRJNA945230](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA945230)
 - **RNA-seq reads**: NCBI BioProject [PRJNA668746](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA668746)
-
-## Related repositories
-
-- Genome assembly: Li et al. (2024), *Chromosome-level genome assembly of the morabine grasshopper Vandiemenella viatica*
-- Neo-sex chromosome recombination dynamics: Jayaprasad et al. (2024), *Molecular Ecology*, [10.1111/mec.17567](https://doi.org/10.1111/mec.17567)
 
 ## Citation
 
@@ -75,7 +70,7 @@ If you use these scripts, please cite:
 
 ## Contact
 
-Suvratha Jayaprasad — [GitHub](https://github.com/suvrathaprasad) · [portfolio](https://suvrathaprasad.github.io)
+Suvratha Jayaprasad — [GitHub](https://github.com/suvrathaprasad) · [Portfolio](https://suvrathaprasad.github.io)
 
 ## License
 
